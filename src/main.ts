@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module,ValidationPipe  } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BooksModule } from './books/books.module';
@@ -16,7 +16,7 @@ export class AppModule {}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   // Configuration de Swagger
   const config = new DocumentBuilder()
     .setTitle('BiblioTech API')

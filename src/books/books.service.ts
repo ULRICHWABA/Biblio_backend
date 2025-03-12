@@ -1,10 +1,10 @@
-    import { InjectModel } from '@nestjs/mongoose';
-    import { Model } from 'mongoose';
-    import { Book, BookDocument } from './books.schema';
-    import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Book, BookDocument } from './books.schema';
 
-    @Injectable()
-    export class BooksService {
+@Injectable()
+export class BooksService {
     constructor(@InjectModel(Book.name) private bookModel: Model<BookDocument>) {}
 
     // Récupérer tous les livres
@@ -18,7 +18,7 @@
         return newBook.save();
     }
 
-    //  Récupérer un livre par ID
+    // Récupérer un livre par ID
     async findById(id: string): Promise<Book | null> {
         return this.bookModel.findById(id).exec();
     }
@@ -37,68 +37,83 @@
     async addComment(id: string, userId: string, userName: string, text: string): Promise<Book> {
         const book = await this.bookModel.findById(id);
         if (!book) {
-        throw new NotFoundException(`Livre avec l'ID ${id} introuvable`);
+            throw new NotFoundException(`Livre avec l'ID ${id} introuvable`);
         }
 
         book.comments.push({ userId, userName, text, date: new Date() });
-
         return book.save();
     }
 
-    //  Ajouter un "J'aime" 👍
-    async likeBook(id: string): Promise<Book> {
-        const book = await this.bookModel.findById(id);
+    // Récupérer les commentaires d'un livre
+    async getComments(bookId: string): Promise<{ userId: string; userName: string; text: string; date: Date }[]> {
+        const book = await this.bookModel.findById(bookId).exec();
         if (!book) {
-        throw new NotFoundException(`Livre avec l'ID ${id} introuvable`);
+            throw new NotFoundException(`Livre avec l'ID ${bookId} introuvable`);
+        }
+        return book.comments;
+    }
+
+    // Ajouter un "J'aime" 👍 ou retirer un "J'aime"
+    async likeBook(bookId: string, userId: string): Promise<Book> {
+        const book = await this.bookModel.findById(bookId);
+        if (!book) {
+            throw new NotFoundException(`Livre avec l'ID ${bookId} introuvable`);
         }
 
-        book.likes += 1;
+        // Vérifier si l'utilisateur a déjà liké
+        const index = book.likedBy.indexOf(userId);
+        if (index === -1) {
+            book.likedBy.push(userId);
+            book.likes += 1;
+        } else {
+            book.likedBy.splice(index, 1);
+            book.likes -= 1;
+        }
+
         return book.save();
     }
 
-    //  Ajouter ou retirer un livre des favoris d'un utilisateur
+    // Ajouter ou retirer un livre des favoris
     async toggleFavorite(bookId: string, userId: string): Promise<Book> {
         const book = await this.bookModel.findById(bookId);
         if (!book) {
-        throw new NotFoundException(`Livre avec l'ID ${bookId} introuvable`);
+            throw new NotFoundException(`Livre avec l'ID ${bookId} introuvable`);
         }
 
         const index = book.favoritedBy.indexOf(userId);
         if (index === -1) {
-        book.favoritedBy.push(userId);
+            book.favoritedBy.push(userId);
         } else {
-        book.favoritedBy.splice(index, 1);
+            book.favoritedBy.splice(index, 1);
         }
 
         return book.save();
     }
 
-    //  Ajouter une note à un livre
+    // Ajouter une note à un livre
     async rateBook(bookId: string, userId: string, rating: number): Promise<Book> {
         if (rating < 1 || rating > 5) {
-        throw new Error('La note doit être entre 1 et 5');
+            throw new BadRequestException('La note doit être entre 1 et 5');
         }
 
         const book = await this.bookModel.findById(bookId);
         if (!book) {
-        throw new NotFoundException(`Livre avec l'ID ${bookId} introuvable`);
+            throw new NotFoundException(`Livre avec l'ID ${bookId} introuvable`);
         }
 
         // Vérifier si l'utilisateur a déjà noté ce livre
         const existingRating = book.ratings.find(r => r.userId === userId);
         if (existingRating) {
-        existingRating.rating = rating;
+            existingRating.rating = rating;
         } else {
-        book.ratings.push({ userId, rating });
+            book.ratings.push({ userId, rating });
         }
 
-        // Calculer la nouvelle moyenne des notes
+        // Calcul de la nouvelle moyenne des notes
         const totalRatings = book.ratings.length;
         const sumRatings = book.ratings.reduce((sum, r) => sum + r.rating, 0);
-        const averageRating = totalRatings > 0 ? sumRatings / totalRatings : 0;
-
-        book.rating = parseFloat(averageRating.toFixed(1));
+        book.rating = parseFloat((sumRatings / totalRatings).toFixed(1));
 
         return book.save();
     }
-    }
+}
