@@ -1,21 +1,12 @@
-import { Module, ValidationPipe } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { BooksModule } from './books/books.module';
 import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-
-@Module({
-  imports: [
-    MongooseModule.forRoot('mongodb+srv://wabaulrich1234:8rDJwE47mAPyqswr@cluster0.r4vtq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'), 
-    
-    BooksModule,
-  ],
-})
-export class AppModule {}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
+  // Appliquer la validation globale
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   // Configuration de Swagger
@@ -28,6 +19,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  // Démarrer l'application sur le port 3000
   await app.listen(3000);
 }
 
