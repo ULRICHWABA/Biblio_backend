@@ -1,0 +1,42 @@
+Contexte :
+	    "BiblioTech" - Une bibliothèque moderne souhaite créer une interface web permettant aux utilisateurs de 
+	consulter et gérer leur catalogue de livres numériques.
+
+Problématique :
+	     Comment créer une interface web dynamique permettant aux utilisateurs de consulter, filtrer et sauvegarder leurs livres préférés, 
+	tout en interagissant avec une API de gestion de livres ?
+
+Fonctionnalités attendues :
+	1 - Affichage des données (Partie 1)
+		a) Afficher une liste de livres depuis un fichier JSON( Tu commenences avec ça en attendant que je fasse ton API)
+		b) Chaque livre affiche : titre, auteur, genre, année, résumé, note
+		c) Générer dynamiquement des cartes de livres avec le DOM
+		d) Sur Chaque livre on a 3 boutons ("commenter", "afficher commentaire", "J'aime ❤️")
+			- Lorqu'on clique sur le bouton "commenter", un formulaire de 2 champs est affiché où il est demandé de reseigner son nom 
+			  et son commentaire
+			- Pour "Afficher commentaire" comme son nom l'indique affiche la liste des commentaires
+			- Quand on clique sur "j'aime" on vois le nombre de personne qui on cliqué sur j'aime augmenté
+
+	2 - Interface interactive (Partie 2)
+		a) Barre de recherche pour filtrer les livres par titre/auteur
+		b) Système de filtres par genre et année
+		c) Tri des livres (par titre, date, note)
+		d) Mise à jour en temps réel de l'affichage
+		e) Possibilité d'ajouter des livres
+
+	3 - Interaction avec l'API (Partie 3)
+		a) Récupération de la liste des livres depuis une API
+		b) Système de favoris (ajout/retrait)
+		c) Permettre a l'utilisateur de voir les livres s'il n'est pas connecter(Celà ne sera possiblle que s'il a deja visité la plate forme une fois au prealable)
+		d) Possibilité de noter les livres
+
+	4 - Améliorations avec des librairies (Partie 4)
+		a) Intégration d'une librairie de notation avec étoiles
+		b) Utilisation d'une librairie de cartes pour un affichage élégant
+		c) Animations fluides lors des interactions
+
+
+NB: Je te laisse la gestion du style mais il faut quand même que ce soit beau et attirant.
+	Voici la commande git a executer pour avoir la structure initiale du projet "git clone https://github.com/Gabriel-SIGNE/projet_merveille_frontend.git durel_projet_js"
+
+Date d'échéance: samedi 22 Mars 2025
